@@ -15,10 +15,10 @@
     function getBarInfo(){
 			var currentAjax =$.ajax({
                type: "POST",
-		       url:"mysqlsel",//图表数据来源
+		       url:"mysql",//图表数据来源
 		       data:{},
 		       success: function(data){
-                   var  strs  =  data.split(',');
+                   var  strs  =  data.replace("[","").replace("]","").split(',');
                    loadcharts(strs);
                },
                 error: function(data) {
@@ -27,7 +27,7 @@
             });
         }
         getBarInfo();
-        setInterval(getBarInfo,10000);
+        setInterval(getBarInfo,60000);
         function loadcharts(data){
         // 路径配置
 		var fileLocation ='../static';//存放文件路径
@@ -114,7 +114,7 @@
     xAxis: [
         {
             type: 'category',
-            data: ['新闻', '论坛', '搜索', '微博', '总量']
+            data: ['新闻', '论坛', '总量', '搜索', '微博']
         }
     ],
     yAxis: [
@@ -127,25 +127,25 @@
             name: '当天',
             type: 'bar',
             itemStyle: itemStyle,
-            data: [4804.7,1444.3,1332.1,908,871.8]
+            data: [1,2,3,4,5]
         },
         {
             name: '上周',
             type: 'bar',
             itemStyle: itemStyle,
-            data: [5506.3,1674.7,1405,1023.2,969]
+            data: [1,2,3,4,5]
         },
         {
             name: '上月',
             type: 'bar',
             itemStyle: itemStyle,
-            data: [6040.9,1823.4,1484.3,1116.1,1063.7]
+            data:[1,2,3,4,5]
         },
         {
             name: '当年',
             type: 'bar',
             itemStyle: itemStyle,
-            data: [6311.9,1902,1745.1,1215.1,1118.3]
+            data: data
         }
     ]
    };
