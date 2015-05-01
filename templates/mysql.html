@@ -18,8 +18,11 @@
 		       url:"mysql",//图表数据来源
 		       data:{},
 		       success: function(data){
-                   var  strs  =  data.replace("[","").replace("]","").split(',');
-                   loadcharts(strs);
+                   var allday =data.allrkl.replace("[","").replace("]","").split(',');
+                   var allweek =data.allweek.replace("[","").replace("]","").split(',');
+                   var allmonth =data.allmonth.replace("[","").replace("]","").split(',');
+                   var allyear =data.allyear.replace("[","").replace("]","").split(',');
+                   loadcharts(allday,allweek,allmonth,allyear);
                },
                 error: function(data) {
 					if(currentAjax){currentAjax.abort();}else{alert("加载失败");}
@@ -28,7 +31,7 @@
         }
         getBarInfo();
         setInterval(getBarInfo,60000);
-        function loadcharts(data){
+        function loadcharts(allday,allweek,allmonth,allyear){
         // 路径配置
 		var fileLocation ='../static';//存放文件路径
         require.config({
@@ -127,25 +130,25 @@
             name: '当天',
             type: 'bar',
             itemStyle: itemStyle,
-            data: [1,2,3,4,5]
+            data: allday
         },
         {
             name: '上周',
             type: 'bar',
             itemStyle: itemStyle,
-            data: [1,2,3,4,5]
+            data: allweek
         },
         {
             name: '上月',
             type: 'bar',
             itemStyle: itemStyle,
-            data:[1,2,3,4,5]
+            data:allmonth
         },
         {
             name: '当年',
             type: 'bar',
             itemStyle: itemStyle,
-            data: data
+            data: allyear
         }
     ]
    };

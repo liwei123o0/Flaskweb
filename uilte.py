@@ -35,8 +35,8 @@ def mysqlweek():
 def mysqlmonth():
     m = Mysql(host="10.6.2.121")
     m.conDB()
-    news =  m.selDB("SELECT COUNT(*) FROM scrapy.news WHERE DATE_FORMAT(INSERT_TIME,'%Y-%m')=DATE_FORMAT(DATE_SUB(curdate(), INTERVAL 0 MONTH),'%Y-%m'); ")[0][0]
-    bbs =   m.selDB("SELECT COUNT(*) FROM scrapy.bbs WHERE DATE_FORMAT(INSERT_TIME,'%Y-%m')=DATE_FORMAT(DATE_SUB(curdate(), INTERVAL 0 MONTH),'%Y-%m');")[0][0]
+    news =  m.selDB("SELECT COUNT(*) FROM scrapy.news WHERE DATE_FORMAT(INSERT_TIME,'%Y-%m')=DATE_FORMAT(DATE_SUB(curdate(), INTERVAL 1 MONTH),'%Y-%m'); ")[0][0]
+    bbs =   m.selDB("SELECT COUNT(*) FROM scrapy.bbs WHERE DATE_FORMAT(INSERT_TIME,'%Y-%m')=DATE_FORMAT(DATE_SUB(curdate(), INTERVAL 1 MONTH),'%Y-%m');")[0][0]
     number = news+bbs
     print number
     # m.selDB("INSERT INTO echarts.user(TYPE,SQLNUM) VALUES('ALLMONTH','%s')"%number)
@@ -52,6 +52,16 @@ def mysqlyear():
     print number
     # m.selDB("INSERT INTO echarts.user(TYPE,SQLNUM) VALUES('ALLYEAR','%s')"%number)
     m.selDB("UPDATE echarts.user SET SQLNUM='%s' WHERE TYPE='ALLYEAR'"% number)
+    m.closeDB()
+#查询今年news的总入库量
+def mysqlyearnews():
+    m = Mysql(host="10.6.2.121")
+    m.conDB()
+    news =  m.selDB("SELECT COUNT(*) FROM scrapy.news WHERE YEAR(date_format(INSERT_TIME,'%Y-%m-%d')) = YEAR(now()); ")[0][0]
+    number = news
+    print number
+    # m.selDB("INSERT INTO echarts.user(TYPE,SQLNUM) VALUES('ALLYEARNEWS','%s')"%number)
+    m.selDB("UPDATE echarts.user SET SQLNUM='%s' WHERE TYPE='ALLYEARNEWS'"% number)
     m.closeDB()
 #查询每天news的总入库量
 def mysqldaynews():
@@ -77,21 +87,21 @@ def mysqlweeknews():
 def mysqlmonthnews():
     m = Mysql(host="10.6.2.121")
     m.conDB()
-    news =  m.selDB("SELECT COUNT(*) FROM scrapy.news WHERE DATE_FORMAT(INSERT_TIME,'%Y-%m')=DATE_FORMAT(DATE_SUB(curdate(), INTERVAL 0 MONTH),'%Y-%m'); ")[0][0]
+    news =  m.selDB("SELECT COUNT(*) FROM scrapy.news WHERE DATE_FORMAT(INSERT_TIME,'%Y-%m')=DATE_FORMAT(DATE_SUB(curdate(), INTERVAL 1 MONTH),'%Y-%m'); ")[0][0]
     number = news
     print number
     # m.selDB("INSERT INTO echarts.user(TYPE,SQLNUM) VALUES('ALLMONTHNEWS','%s')"%number)
     m.selDB("UPDATE echarts.user SET SQLNUM='%s' WHERE TYPE='ALLMONTHNEWS'"% number)
     m.closeDB()
 #查询今年bbs的总入库量
-def mysqlyearnews():
+def mysqlyearbbs():
     m = Mysql(host="10.6.2.121")
     m.conDB()
-    bbs =  m.selDB("SELECT COUNT(*) FROM scrapy.news WHERE YEAR(date_format(INSERT_TIME,'%Y-%m-%d')) = YEAR(now()); ")[0][0]
+    bbs =  m.selDB("SELECT COUNT(*) FROM scrapy.bbs WHERE YEAR(date_format(INSERT_TIME,'%Y-%m-%d')) = YEAR(now()); ")[0][0]
     number = bbs
     print number
     # m.selDB("INSERT INTO echarts.user(TYPE,SQLNUM) VALUES('ALLYEARNEWS','%s')"%number)
-    m.selDB("UPDATE echarts.user SET SQLNUM='%s' WHERE TYPE='ALLYEARNEWS'"% number)
+    m.selDB("UPDATE echarts.user SET SQLNUM='%s' WHERE TYPE='ALLYEARBBS'"% number)
     m.closeDB()
 #查询每天bbs的总入库量
 def mysqldaybbs():
@@ -117,21 +127,11 @@ def mysqlweekbbs():
 def mysqlmonthbbs():
     m = Mysql(host="10.6.2.121")
     m.conDB()
-    bbs =  m.selDB("SELECT COUNT(*) FROM scrapy.bbs WHERE DATE_FORMAT(INSERT_TIME,'%Y-%m')=DATE_FORMAT(DATE_SUB(curdate(), INTERVAL 0 MONTH),'%Y-%m'); ")[0][0]
+    bbs =  m.selDB("SELECT COUNT(*) FROM scrapy.bbs WHERE DATE_FORMAT(INSERT_TIME,'%Y-%m')=DATE_FORMAT(DATE_SUB(curdate(), INTERVAL 1 MONTH),'%Y-%m'); ")[0][0]
     number = bbs
     print number
     # m.selDB("INSERT INTO echarts.user(TYPE,SQLNUM) VALUES('ALLMONTHBBS','%s')"%number)
     m.selDB("UPDATE echarts.user SET SQLNUM='%s' WHERE TYPE='ALLMONTHBBS'"% number)
-    m.closeDB()
-#查询今年bbs的总入库量
-def mysqlyearbbs():
-    m = Mysql(host="10.6.2.121")
-    m.conDB()
-    news =  m.selDB("SELECT COUNT(*) FROM scrapy.bbs WHERE YEAR(date_format(INSERT_TIME,'%Y-%m-%d')) = YEAR(now()); ")[0][0]
-    number = news
-    print number
-    # m.selDB("INSERT INTO echarts.user(TYPE,SQLNUM) VALUES('ALLYEARNEWS','%s')"%number)
-    m.selDB("UPDATE echarts.user SET SQLNUM='%s' WHERE TYPE='ALLYEARNEWS'"% number)
     m.closeDB()
 #测试
 if __name__=="__main__":
