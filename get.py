@@ -9,8 +9,15 @@ app = Flask(__name__)
 @app.route("/mysqlsel",methods=["GET","POST"])
 def get():
     a = selmysql()
-    a = a[0]+",%s"%a[1]+",%s"%a[2]+",%s"%a[3]+",%s"%a[4]+",%s"%a[5]+",%s"%a[6]+",%s"%a[7]+",%s"%a[8]+",%s"%a[9]
-    return a
+    ssnews = a[0]
+    ssbbs  = a[1]
+    sszl   = a[2]
+    data ={
+        "ssnews":"%s"%ssnews,
+        "ssbbs" :"%s"%ssbbs,
+        "sszl"  :"%s"%sszl
+        }
+    return jsonify(data)
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -26,12 +33,21 @@ def mysqljk():
 #实时10分钟数据入库量
 def selmysql():
     data =[]
+    ssnews=[]
+    ssbbs =[]
     My = Mysql(host="10.6.2.121")
     My.conDB()
     for i in range(10,110,10):
         rkl= My.selDB(u"SELECT COUNT(*) FROM scrapy.news WHERE INSERT_TIME>=NOW()-INTERVAL %d MINUTE AND  INSERT_TIME< NOW() - INTERVAL %d MINUTE"%(i,i-10))[0][0]
-        data.append(str(rkl))
+        ssnews.append(int(rkl))
+    for i in range(10,110,10):
+        rkl= My.selDB(u"SELECT COUNT(*) FROM scrapy.bbs WHERE INSERT_TIME>=NOW()-INTERVAL %d MINUTE AND  INSERT_TIME< NOW() - INTERVAL %d MINUTE"%(i,i-10))[0][0]
+        ssbbs.append(int(rkl))
     My.closeDB()
+    sszl = [ssnews[i] + ssbbs[i] for i in xrange(min(len(ssnews),len(ssbbs)))]
+    data.append(ssnews)
+    data.append(ssbbs)
+    data.append(sszl)
     return data
 #获取当天总入库量
 @app.route("/mysql",methods=["GET","POST"])
@@ -61,8 +77,6 @@ def mysql():
         "allyear":"[%s,%s,%s]"%(allyearnews,allyearbbs,allyear)
         }
     sql.closeDB()
-    print data
     return jsonify(data)
 if __name__ =="__main__":
     app.run(host="0.0.0.0",port=80,debug=True)
-    # print mysql()

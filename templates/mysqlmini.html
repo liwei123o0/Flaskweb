@@ -26,8 +26,10 @@
 		       url:"mysqlsel",//图表数据来源
 		       data:{},
 		       success: function(data){
-                   var  strs  =  data.split(',');
-                   loadcharts(strs);
+                   var ssnews =data.ssnews.replace("[","").replace("]","").split(',');
+                   var ssbbs =data.ssbbs.replace("[","").replace("]","").split(',');
+                   var sszl =data.sszl.replace("[","").replace("]","").split(',');
+                   loadcharts(ssnews,ssbbs,sszl);
                },
                 error: function(data) {
 					if(currentAjax){currentAjax.abort();}else{alert("加载失败");}
@@ -36,7 +38,7 @@
         }
         getBarInfo();
         setInterval(getBarInfo,10000);
-        function loadcharts(data){
+        function loadcharts(ssnews,ssbbs,sszl){
         // 路径配置
 		var fileLocation ='../static';//存放文件路径
         require.config({
@@ -63,7 +65,7 @@
         trigger: 'axis'
     },
     legend: {
-        data:['news']
+        data:['news','bbs','总量']
     },
     toolbox: {
         show : true,
@@ -109,7 +111,17 @@
         {
             name:'news',
             type:'bar',
-            data:data
+            data:ssnews
+        },
+            {
+            name:'bbs',
+            type:'bar',
+            data:ssbbs
+        },
+            {
+            name:'总量',
+            type:'line',
+            data:sszl
         }
     ]
 };
