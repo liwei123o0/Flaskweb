@@ -28,8 +28,10 @@
 		       success: function(data){
                    var ssnews =data.ssnews.replace("[","").replace("]","").split(',');
                    var ssbbs =data.ssbbs.replace("[","").replace("]","").split(',');
+                   var sssina =data.sssina.replace("[","").replace("]","").split(',');
+                   var ssweixin =data.ssweixin.replace("[","").replace("]","").split(',');
                    var sszl =data.sszl.replace("[","").replace("]","").split(',');
-                   loadcharts(ssnews,ssbbs,sszl);
+                   loadcharts(ssnews,ssbbs,sssina,ssweixin,sszl);
                },
                 error: function(data) {
 					if(currentAjax){currentAjax.abort();}else{alert("加载失败");}
@@ -38,7 +40,7 @@
         }
         getBarInfo();
         setInterval(getBarInfo,10000);
-        function loadcharts(ssnews,ssbbs,sszl){
+        function loadcharts(ssnews,ssbbs,sssina,ssweixin,sszl){
         // 路径配置
 		var fileLocation ='../static';//存放文件路径
         require.config({
@@ -65,7 +67,7 @@
         trigger: 'axis'
     },
     legend: {
-        data:['news','bbs','总量']
+        data:['news','bbs','sina','weixin','总量']
     },
     toolbox: {
         show : true,
@@ -117,6 +119,16 @@
             name:'bbs',
             type:'bar',
             data:ssbbs
+        },
+            {
+            name:'sina',
+            type:'bar',
+            data:sssina
+        },
+            {
+            name:'weixin',
+            type:'bar',
+            data:ssweixin
         },
             {
             name:'总量',

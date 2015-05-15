@@ -15,7 +15,8 @@ def mysqlday():
     m.conDB()
     news =  m.selDB("SELECT COUNT(*) FROM scrapy.news WHERE DAY(date_format(INSERT_TIME,'%Y-%m-%d')) = DAY(now()); ")[0][0]
     bbs =   m.selDB("SELECT COUNT(*) FROM scrapy.bbs WHERE DAY(date_format(INSERT_TIME,'%Y-%m-%d')) = DAY(now()); ")[0][0]
-    number = news+bbs
+    sina =  m.selDB("SELECT COUNT(*) FROM weibo.sina WHERE DAY(date_format(INSERT_TIME,'%Y-%m-%d')) = DAY(now());")[0][0]
+    number = news+bbs+sina
     print number
     # m.selDB("INSERT INTO echarts.user(TYPE,SQLNUM) VALUES('ALLDAY','%s')"%number)
     m.selDB("UPDATE echarts.user SET SQLNUM='%s' WHERE TYPE='ALLDAY'"% number)
@@ -26,7 +27,8 @@ def mysqlweek():
     m.conDB()
     news =  m.selDB("SELECT COUNT(*) FROM scrapy.news WHERE YEARWEEK(date_format(INSERT_TIME,'%Y-%m-%d')) = YEARWEEK(now())-1; ")[0][0]
     bbs =   m.selDB("SELECT COUNT(*) FROM scrapy.bbs WHERE YEARWEEK(date_format(INSERT_TIME,'%Y-%m-%d')) = YEARWEEK(now())-1;")[0][0]
-    number = news+bbs
+    sina =  m.selDB("SELECT COUNT(*) FROM weibo.sina WHERE YEARWEEK(date_format(INSERT_TIME,'%Y-%m-%d')) = YEARWEEK(now())-1;")[0][0]
+    number = news+bbs+sina
     print number
     # m.selDB("INSERT INTO echarts.user(TYPE,SQLNUM) VALUES('ALLWEEK','%s')"%number)
     m.selDB("UPDATE echarts.user SET SQLNUM='%s' WHERE TYPE='ALLWEEK'"% number)
@@ -37,7 +39,8 @@ def mysqlmonth():
     m.conDB()
     news =  m.selDB("SELECT COUNT(*) FROM scrapy.news WHERE DATE_FORMAT(INSERT_TIME,'%Y-%m')=DATE_FORMAT(DATE_SUB(curdate(), INTERVAL 1 MONTH),'%Y-%m'); ")[0][0]
     bbs =   m.selDB("SELECT COUNT(*) FROM scrapy.bbs WHERE DATE_FORMAT(INSERT_TIME,'%Y-%m')=DATE_FORMAT(DATE_SUB(curdate(), INTERVAL 1 MONTH),'%Y-%m');")[0][0]
-    number = news+bbs
+    sina =  m.selDB("SELECT COUNT(*) FROM weibo.sina WHERE DATE_FORMAT(INSERT_TIME,'%Y-%m')=DATE_FORMAT(DATE_SUB(curdate(), INTERVAL 1 MONTH),'%Y-%m');")[0][0]
+    number = news+bbs+sina
     print number
     # m.selDB("INSERT INTO echarts.user(TYPE,SQLNUM) VALUES('ALLMONTH','%s')"%number)
     m.selDB("UPDATE echarts.user SET SQLNUM='%s' WHERE TYPE='ALLMONTH'"% number)
@@ -48,7 +51,8 @@ def mysqlyear():
     m.conDB()
     news =  m.selDB("SELECT COUNT(*) FROM scrapy.news WHERE YEAR(date_format(INSERT_TIME,'%Y-%m-%d')) = YEAR(now()); ")[0][0]
     bbs =   m.selDB("SELECT COUNT(*) FROM scrapy.bbs WHERE YEAR(date_format(INSERT_TIME,'%Y-%m-%d')) = YEAR(now());")[0][0]
-    number = news+bbs
+    sina =  m.selDB("SELECT COUNT(*) FROM scrapy.bbs WHERE YEAR(date_format(INSERT_TIME,'%Y-%m-%d')) = YEAR(now());")[0][0]
+    number = news+bbs+sina
     print number
     # m.selDB("INSERT INTO echarts.user(TYPE,SQLNUM) VALUES('ALLYEAR','%s')"%number)
     m.selDB("UPDATE echarts.user SET SQLNUM='%s' WHERE TYPE='ALLYEAR'"% number)
@@ -100,7 +104,7 @@ def mysqlyearbbs():
     bbs =  m.selDB("SELECT COUNT(*) FROM scrapy.bbs WHERE YEAR(date_format(INSERT_TIME,'%Y-%m-%d')) = YEAR(now()); ")[0][0]
     number = bbs
     print number
-    # m.selDB("INSERT INTO echarts.user(TYPE,SQLNUM) VALUES('ALLYEARNEWS','%s')"%number)
+    # m.selDB("INSERT INTO echarts.user(TYPE,SQLNUM) VALUES('ALLYEARBBS','%s')"%number)
     m.selDB("UPDATE echarts.user SET SQLNUM='%s' WHERE TYPE='ALLYEARBBS'"% number)
     m.closeDB()
 #查询每天bbs的总入库量
@@ -133,8 +137,47 @@ def mysqlmonthbbs():
     # m.selDB("INSERT INTO echarts.user(TYPE,SQLNUM) VALUES('ALLMONTHBBS','%s')"%number)
     m.selDB("UPDATE echarts.user SET SQLNUM='%s' WHERE TYPE='ALLMONTHBBS'"% number)
     m.closeDB()
-#测试
-if __name__=="__main__":
+#查询今年sina的总入库量
+def mysqlyearsina():
+    m = Mysql(host="10.6.2.121")
+    m.conDB()
+    sina =  m.selDB("SELECT COUNT(*) FROM weibo.sina WHERE YEAR(date_format(INSERT_TIME,'%Y-%m-%d')) = YEAR(now()); ")[0][0]
+    number = sina
+    print number
+    # m.selDB("INSERT INTO echarts.user(TYPE,SQLNUM) VALUES('ALLYEARSINA','%s')"%number)
+    m.selDB("UPDATE echarts.user SET SQLNUM='%s' WHERE TYPE='ALLYEARSINA'"% number)
+    m.closeDB()
+#查询每天sina的总入库量
+def mysqldaysina():
+    m = Mysql(host="10.6.2.121")
+    m.conDB()
+    sina =  m.selDB("SELECT COUNT(*) FROM weibo.sina WHERE DAY(date_format(INSERT_TIME,'%Y-%m-%d')) = DAY(now()); ")[0][0]
+    number = sina
+    print number
+    # m.selDB("INSERT INTO echarts.user(TYPE,SQLNUM) VALUES('ALLDAYSINA','%s')"%number)
+    m.selDB("UPDATE echarts.user SET SQLNUM='%s' WHERE TYPE='ALLDAYSINA'"% number)
+    m.closeDB()
+#查询上周sina的总入库量
+def mysqlweeksina():
+    m = Mysql(host="10.6.2.121")
+    m.conDB()
+    sina =  m.selDB("SELECT COUNT(*) FROM weibo.sina WHERE YEARWEEK(date_format(INSERT_TIME,'%Y-%m-%d')) = YEARWEEK(now())-1; ")[0][0]
+    number = sina
+    print number
+    # m.selDB("INSERT INTO echarts.user(TYPE,SQLNUM) VALUES('ALLWEEKSINA','%s')"%number)
+    m.selDB("UPDATE echarts.user SET SQLNUM='%s' WHERE TYPE='ALLWEEKSINA'"% number)
+    m.closeDB()
+#查询上月sina的总入库量
+def mysqlmonthsina():
+    m = Mysql(host="10.6.2.121")
+    m.conDB()
+    sina =  m.selDB("SELECT COUNT(*) FROM weibo.sina WHERE DATE_FORMAT(INSERT_TIME,'%Y-%m')=DATE_FORMAT(DATE_SUB(curdate(), INTERVAL 1 MONTH),'%Y-%m'); ")[0][0]
+    number = sina
+    print number
+    # m.selDB("INSERT INTO echarts.user(TYPE,SQLNUM) VALUES('ALLMONTHSINA','%s')"%number)
+    m.selDB("UPDATE echarts.user SET SQLNUM='%s' WHERE TYPE='ALLMONTHSINA'"% number)
+    m.closeDB()
+def main():
     mysqlday()
     mysqlweek()
     mysqlmonth()
@@ -147,3 +190,10 @@ if __name__=="__main__":
     mysqlweekbbs()
     mysqlmonthbbs()
     mysqlyearbbs()
+    mysqldaysina()
+    mysqlweeksina()
+    mysqlmonthsina()
+    mysqlyearsina()
+#测试
+if __name__=="__main__":
+    main()

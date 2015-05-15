@@ -21,8 +21,7 @@
                    var allday =data.allrkl.replace("[","").replace("]","").split(',');
                    var allweek =data.allweek.replace("[","").replace("]","").split(',');
                    var allmonth =data.allmonth.replace("[","").replace("]","").split(',');
-                   var allyear =data.allyear.replace("[","").replace("]","").split(',');
-                   loadcharts(allday,allweek,allmonth,allyear);
+                   loadcharts(allday,allweek,allmonth);
                },
                 error: function(data) {
 					if(currentAjax){currentAjax.abort();}else{alert("加载失败");}
@@ -31,7 +30,7 @@
         }
         getBarInfo();
         setInterval(getBarInfo,6000000);
-        function loadcharts(allday,allweek,allmonth,allyear){
+        function loadcharts(allday,allweek,allmonth){
         // 路径配置
 		var fileLocation ='../static';//存放文件路径
         require.config({
@@ -43,7 +42,8 @@
         require(
             [
                 'echarts',
-                'echarts/chart/bar' // 使用柱状图就加载bar模块，按需加载
+                'echarts/chart/bar', // 使用柱状图就加载bar模块，按需加载
+                'echarts/chart/line'
             ],
             function (ec) {
                 // 基于准备好的dom，初始化echarts图表
@@ -95,7 +95,7 @@
     },
     legend: {
         x: 'right',
-        data:['当天','上周','上月','当年']
+        data:['当天','上周','上月']
     },
     toolbox: {
         show: true,
@@ -117,7 +117,7 @@
     xAxis: [
         {
             type: 'category',
-            data: ['新闻', '论坛', '总量', '搜索', '微博']
+            data: ['新闻', '论坛','微博', '总量']
         }
     ],
     yAxis: [
@@ -143,13 +143,8 @@
             type: 'bar',
             itemStyle: itemStyle,
             data:allmonth
-        },
-        {
-            name: '当年',
-            type: 'bar',
-            itemStyle: itemStyle,
-            data: allyear
         }
+
     ]
    };
 

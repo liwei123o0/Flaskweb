@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 #! /usr/bin/env python
-from flask import Flask,render_template,request,jsonify
+from flask import Flask,render_template,jsonify
 from mysqlutile import Mysql
-import json
 app = Flask(__name__)
 
 #十分钟实时数据
@@ -12,9 +11,13 @@ def get():
     ssnews = a[0]
     ssbbs  = a[1]
     sszl   = a[2]
+    sssina = a[3]
+    ssweixin=a[4]
     data ={
         "ssnews":"%s"%ssnews,
         "ssbbs" :"%s"%ssbbs,
+        "sssina":"%s"%sssina,
+        "ssweixin":"%s"%ssweixin,
         "sszl"  :"%s"%sszl
         }
     return jsonify(data)
@@ -35,19 +38,32 @@ def selmysql():
     data =[]
     ssnews=[]
     ssbbs =[]
+    sssina=[]
+    ssweixin=[]
     My = Mysql(host="10.6.2.121")
     My.conDB()
+    My1 = Mysql(host="10.6.2.79",user="root",passwd="123@asd")
+    My1.conDB()
     for i in range(10,110,10):
         rkl= My.selDB(u"SELECT COUNT(*) FROM scrapy.news WHERE INSERT_TIME>=NOW()-INTERVAL %d MINUTE AND  INSERT_TIME< NOW() - INTERVAL %d MINUTE"%(i,i-10))[0][0]
         ssnews.append(int(rkl))
     for i in range(10,110,10):
         rkl= My.selDB(u"SELECT COUNT(*) FROM scrapy.bbs WHERE INSERT_TIME>=NOW()-INTERVAL %d MINUTE AND  INSERT_TIME< NOW() - INTERVAL %d MINUTE"%(i,i-10))[0][0]
         ssbbs.append(int(rkl))
+    for i in range(10,110,10):
+        rkl= My.selDB(u"SELECT COUNT(*) FROM weibo.sina WHERE INSERT_TIME>=NOW()-INTERVAL %d MINUTE AND  INSERT_TIME< NOW() - INTERVAL %d MINUTE"%(i,i-10))[0][0]
+        sssina.append(int(rkl))
+    for i in range(10,110,10):
+        rkl= My1.selDB(u"SELECT COUNT(*) FROM WEBSITE_WEIXIN.WEIXIN WHERE STORE_TIME>=NOW()-INTERVAL %d MINUTE AND  STORE_TIME< NOW() - INTERVAL %d MINUTE"%(i,i-10))[0][0]
+        ssweixin.append(int(rkl))
     My.closeDB()
-    sszl = [ssnews[i] + ssbbs[i] for i in xrange(min(len(ssnews),len(ssbbs)))]
+    My1.closeDB()
+    sszl = [ssnews[i] + ssbbs[i] +sssina[i] + ssweixin[i] for i in xrange(min(len(ssnews),len(ssbbs)))]
     data.append(ssnews)
     data.append(ssbbs)
     data.append(sszl)
+    data.append(sssina)
+    data.append(ssweixin)
     return data
 #获取当天总入库量
 @app.route("/mysql",methods=["GET","POST"])
@@ -57,24 +73,28 @@ def mysql():
     #获取当天入库量
     allnews = sql.selDB(u"SELECT SQLNUM FROM echarts.user WHERE TYPE='ALLDAYNEWS'")[0][0]
     allbbs  = sql.selDB(u"SELECT SQLNUM FROM echarts.user WHERE TYPE='ALLDAYBBS'")[0][0]
+    allsina = sql.selDB(u"SELECT SQLNUM FROM echarts.user WHERE TYPE='ALLDAYSINA'")[0][0]
     all     = sql.selDB(u"SELECT SQLNUM FROM echarts.user WHERE TYPE='ALLDAY'")[0][0]
     #获取上周入库量
     allweeknews = sql.selDB(u"SELECT SQLNUM FROM echarts.user WHERE TYPE='ALLWEEKNEWS'")[0][0]
     allweekbbs  = sql.selDB(u"SELECT SQLNUM FROM echarts.user WHERE TYPE='ALLWEEKBBS'")[0][0]
+    allweeksina  = sql.selDB(u"SELECT SQLNUM FROM echarts.user WHERE TYPE='ALLWEEKSINA'")[0][0]
     allweek     = sql.selDB(u"SELECT SQLNUM FROM echarts.user WHERE TYPE='ALLWEEK'")[0][0]
     #获取上月入库量
     allmonthnews = sql.selDB(u"SELECT SQLNUM FROM echarts.user WHERE TYPE='ALLMONTHNEWS'")[0][0]
     allmonthbbs  = sql.selDB(u"SELECT SQLNUM FROM echarts.user WHERE TYPE='ALLMONTHBBS'")[0][0]
+    allmonthsina  = sql.selDB(u"SELECT SQLNUM FROM echarts.user WHERE TYPE='ALLMONTHSINA'")[0][0]
     allmonth     = sql.selDB(u"SELECT SQLNUM FROM echarts.user WHERE TYPE='ALLMONTH'")[0][0]
     #获取当年入库总量
     allyearnews = sql.selDB(u"SELECT SQLNUM FROM echarts.user WHERE TYPE='ALLYEARNEWS'")[0][0]
     allyearbbs  = sql.selDB(u"SELECT SQLNUM FROM echarts.user WHERE TYPE='ALLYEARBBS'")[0][0]
+    allyearsina  = sql.selDB(u"SELECT SQLNUM FROM echarts.user WHERE TYPE='ALLYEARSINA'")[0][0]
     allyear     = sql.selDB(u"SELECT SQLNUM FROM echarts.user WHERE TYPE='ALLYEAR'")[0][0]
     data={
-        "allrkl":"[%s,%s,%s]"%(allnews,allbbs,all),
-        "allweek":"[%s,%s,%s]"%(allweeknews,allweekbbs,allweek),
-        "allmonth":"[%s,%s,%s]"%(allmonthnews,allmonthbbs,allmonth),
-        "allyear":"[%s,%s,%s]"%(allyearnews,allyearbbs,allyear)
+        "allrkl":"[%s,%s,%s,%s]"%(allnews,allbbs,allsina,all),
+        "allweek":"[%s,%s,%s,%s]"%(allweeknews,allweekbbs,allweeksina,allweek),
+        "allmonth":"[%s,%s,%s,%s]"%(allmonthnews,allmonthbbs,allmonthsina,allmonth),
+        "allyear":"[%s,%s,%s,%s]"%(allyearnews,allyearbbs,allyearsina,allyear)
         }
     sql.closeDB()
     return jsonify(data)
