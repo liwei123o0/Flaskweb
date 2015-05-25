@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #! /usr/bin/env python
 from mysqlutile import Mysql
+import time
 u'''
 查询入库量py
 1.mysqlday()方法    //查询每天的总入库量
@@ -13,9 +14,9 @@ u'''
 def mysqlday():
     m = Mysql(host="10.6.2.121")
     m.conDB()
-    news =  m.selDB("SELECT COUNT(*) FROM scrapy.news WHERE DAY(date_format(INSERT_TIME,'%Y-%m-%d')) = DAY(now()); ")[0][0]
-    bbs =   m.selDB("SELECT COUNT(*) FROM scrapy.bbs WHERE DAY(date_format(INSERT_TIME,'%Y-%m-%d')) = DAY(now()); ")[0][0]
-    sina =  m.selDB("SELECT COUNT(*) FROM weibo.sina WHERE DAY(date_format(INSERT_TIME,'%Y-%m-%d')) = DAY(now());")[0][0]
+    news =  m.selDB("SELECT COUNT(*) FROM scrapy.news WHERE DATE_SUB(CURDATE(), INTERVAL 0 DAY) = date(INSERT_TIME); ")[0][0]
+    bbs =   m.selDB("SELECT COUNT(*) FROM scrapy.bbs WHERE DATE_SUB(CURDATE(), INTERVAL 0 DAY) = date(INSERT_TIME); ")[0][0]
+    sina =  m.selDB("SELECT COUNT(*) FROM weibo.sina WHERE DATE_SUB(CURDATE(), INTERVAL 0 DAY) = date(INSERT_TIME);")[0][0]
     number = news+bbs+sina
     print number
     # m.selDB("INSERT INTO echarts.user(TYPE,SQLNUM) VALUES('ALLDAY','%s')"%number)
@@ -71,7 +72,7 @@ def mysqlyearnews():
 def mysqldaynews():
     m = Mysql(host="10.6.2.121")
     m.conDB()
-    news =  m.selDB("SELECT COUNT(*) FROM scrapy.news WHERE DAY(date_format(INSERT_TIME,'%Y-%m-%d')) = DAY(now()); ")[0][0]
+    news =  m.selDB("SELECT COUNT(*) FROM scrapy.news WHERE DATE_SUB(CURDATE(), INTERVAL 0 DAY) = date(INSERT_TIME); ")[0][0]
     number = news
     print number
     # m.selDB("INSERT INTO echarts.user(TYPE,SQLNUM) VALUES('ALLDAYNEWS','%s')"%number)
@@ -111,7 +112,7 @@ def mysqlyearbbs():
 def mysqldaybbs():
     m = Mysql(host="10.6.2.121")
     m.conDB()
-    bbs =  m.selDB("SELECT COUNT(*) FROM scrapy.bbs WHERE DAY(date_format(INSERT_TIME,'%Y-%m-%d')) = DAY(now()); ")[0][0]
+    bbs =  m.selDB("SELECT COUNT(*) FROM scrapy.bbs WHERE DATE_SUB(CURDATE(), INTERVAL 0 DAY) = date(INSERT_TIME); ")[0][0]
     number = bbs
     print number
     # m.selDB("INSERT INTO echarts.user(TYPE,SQLNUM) VALUES('ALLDAYBBS','%s')"%number)
@@ -151,7 +152,7 @@ def mysqlyearsina():
 def mysqldaysina():
     m = Mysql(host="10.6.2.121")
     m.conDB()
-    sina =  m.selDB("SELECT COUNT(*) FROM weibo.sina WHERE DAY(date_format(INSERT_TIME,'%Y-%m-%d')) = DAY(now()); ")[0][0]
+    sina =  m.selDB("SELECT COUNT(*) FROM weibo.sina WHERE DATE_SUB(CURDATE(), INTERVAL 0 DAY) = date(INSERT_TIME); ")[0][0]
     number = sina
     print number
     # m.selDB("INSERT INTO echarts.user(TYPE,SQLNUM) VALUES('ALLDAYSINA','%s')"%number)
@@ -177,6 +178,29 @@ def mysqlmonthsina():
     # m.selDB("INSERT INTO echarts.user(TYPE,SQLNUM) VALUES('ALLMONTHSINA','%s')"%number)
     m.selDB("UPDATE echarts.user SET SQLNUM='%s' WHERE TYPE='ALLMONTHSINA'"% number)
     m.closeDB()
+#查询三十天数据
+def data30():
+    m = Mysql(host="10.6.2.121")
+    m.conDB()
+    m.selDB("DELETE FROM echarts.user  WHERE TYPE LIKE '%TIME%'")
+    for i in xrange(0,30):
+        timedata = m.selDB("SELECT DATE_SUB(CURDATE(), INTERVAL %s DAY)"% i)[0][0]
+        daynews  = m.selDB("SELECT COUNT(*) FROM scrapy.news where date(INSERT_TIME)=DATE_SUB(CURDATE(), INTERVAL %s DAY)"% i)[0][0]
+        daybbs   = m.selDB("SELECT COUNT(*) FROM scrapy.bbs where date(INSERT_TIME)=DATE_SUB(CURDATE(), INTERVAL %s DAY)"% i)[0][0]
+        daysina  = m.selDB("SELECT COUNT(*) FROM weibo.sina where date(INSERT_TIME)=DATE_SUB(CURDATE(), INTERVAL %s DAY)"% i)[0][0]
+        day      = daynews+daybbs+daysina
+        #插入30天数据量
+        m.selDB("INSERT INTO echarts.user(TYPE,SQLNUM,DAY_TIME) VALUES ('TIMEDAYNEWS','%s','%s')"%(daynews,timedata))
+        m.selDB("INSERT INTO echarts.user(TYPE,SQLNUM,DAY_TIME) VALUES ('TIMEDAYBBS','%s','%s')"%(daybbs,timedata))
+        m.selDB("INSERT INTO echarts.user(TYPE,SQLNUM,DAY_TIME) VALUES ('TIMEDAYSINA','%s','%s')"%(daysina,timedata))
+        m.selDB("INSERT INTO echarts.user(TYPE,SQLNUM,DAY_TIME) VALUES ('TIMEDAY','%s','%s')"%(day,timedata))
+        #更新30天数据量
+        # m.selDB("UPDATE echarts.user SET SQLNUM='%s',DAY_TIME='%s' WHERE TYPE='TIMEDAYNEWS' AND date(DAY_TIME)<=DATE_SUB(CURDATE(), INTERVAL %d DAY) LIMIT 1"%(daynews,time,i))
+        # m.selDB("UPDATE echarts.user SET SQLNUM='%s',DAY_TIME='%s' WHERE TYPE='TIMEDAYBBS' AND date(DAY_TIME)<=DATE_SUB(CURDATE(), INTERVAL %d DAY) LIMIT 1"%(daybbs,time,i))
+        # m.selDB("UPDATE echarts.user SET SQLNUM='%s',DAY_TIME='%s' WHERE TYPE='TIMEDAYSINA' AND date(DAY_TIME)<=DATE_SUB(CURDATE(), INTERVAL %d DAY) LIMIT 1"%(daysina,time,i))
+        # m.selDB("UPDATE echarts.user SET SQLNUM='%s',DAY_TIME='%s' WHERE TYPE='TIMEDAY' AND date(DAY_TIME)<=DATE_SUB(CURDATE(), INTERVAL %d DAY) LIMIT 1"%(day,time,i))
+        print timedata,daynews,daybbs,daysina,day
+    m.closeDB()
 def main():
     mysqlday()
     mysqlweek()
@@ -194,6 +218,8 @@ def main():
     mysqlweeksina()
     mysqlmonthsina()
     mysqlyearsina()
+    data30()
 #测试
 if __name__=="__main__":
     main()
+    # data30()

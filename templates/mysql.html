@@ -6,7 +6,7 @@
 </head>
 <body>
     <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
-    <div id="main" style="height:400px"></div>
+    <div id="main" style="height:400px;"></div>
     <!-- ECharts单文件引入 -->
     <script src="../static/echarts.js"></script>
     <script src="../static/jquery.js"></script>
@@ -109,10 +109,9 @@
         }
     },
     calculable: true,
-    grid: {
-        y: 80,
-        y2: 40,
-        x2: 40
+    grid :{
+      x1:0,
+      y1:0
     },
     xAxis: [
         {

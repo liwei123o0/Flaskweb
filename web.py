@@ -33,6 +33,9 @@ def ZLmysql():
 @app.route("/mysqljk")
 def mysqljk():
     return render_template("mysqljk.html")
+@app.route("/lsdata")
+def monthdata():
+    return render_template("lsdata.html")
 #实时10分钟数据入库量
 def selmysql():
     data =[]
@@ -96,6 +99,44 @@ def mysql():
         "allmonth":"[%s,%s,%s,%s]"%(allmonthnews,allmonthbbs,allmonthsina,allmonth),
         "allyear":"[%s,%s,%s,%s]"%(allyearnews,allyearbbs,allyearsina,allyear)
         }
+    sql.closeDB()
+    return jsonify(data)
+@app.route("/day30",methods=["GET","POST"])
+def day30():
+    sql = Mysql(host="10.6.2.121")
+    sql.conDB()
+    #获取news三十天数据
+    news30=[]
+    bbs30=[]
+    sina30=[]
+    all30=[]
+    day30=[]
+    for i in xrange(0,30):
+        news = sql.selDB(u"SELECT SQLNUM FROM echarts.user WHERE TYPE='TIMEDAYNEWS' AND date(DAY_TIME)=DATE_SUB(CURDATE(), INTERVAL %d DAY)"% i)[0][0]
+        news30.append(int(news))
+        bbs = sql.selDB(u"SELECT SQLNUM FROM echarts.user WHERE TYPE='TIMEDAYBBS' AND date(DAY_TIME)=DATE_SUB(CURDATE(), INTERVAL %d DAY)"% i)[0][0]
+        bbs30.append(int(bbs))
+        sina = sql.selDB(u"SELECT SQLNUM FROM echarts.user WHERE TYPE='TIMEDAYSINA' AND date(DAY_TIME)=DATE_SUB(CURDATE(), INTERVAL %d DAY)"% i)[0][0]
+        sina30.append(int(sina))
+        all = sql.selDB(u"SELECT SQLNUM FROM echarts.user WHERE TYPE='TIMEDAY' AND date(DAY_TIME)=DATE_SUB(CURDATE(), INTERVAL %d DAY)"% i)[0][0]
+        all30.append(int(all))
+        daytime =str(sql.selDB("SELECT DATE_SUB(CURDATE(), INTERVAL %s DAY)"% i)[0][0])
+        day30.append(daytime)
+        print daytime
+    print news30
+    news30.reverse()
+    bbs30.reverse()
+    sina30.reverse()
+    all30.reverse()
+    day30.reverse()
+    print day30
+    data={
+        "news30":"%s"%news30,
+        "bbs30":"%s"% bbs30,
+        "sina30":"%s"%sina30,
+        "all30":"%s"%all30,
+        "day30":"%s"%day30
+    }
     sql.closeDB()
     return jsonify(data)
 if __name__ =="__main__":

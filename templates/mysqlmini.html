@@ -2,12 +2,10 @@
 <html>
 <head lang="en">
     <meta charset="UTF-8">
-    <title>监控系统</title>
 </head>
 <body>
     <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
-    <h1 align="center">监控系统</h1>
-    <div id="main" style="height:400px"></div>
+    <div id="main" style="height:400px;"></div>
 </body>
 </html>
     <!-- ECharts单文件引入 -->
@@ -83,6 +81,10 @@
         show : false,
         start : 0,
         end : 100
+    },
+    grid :{
+      x1:0,
+      y1:0
     },
     xAxis : [
         {
