@@ -2,7 +2,6 @@
 #! /usr/bin/env python
 from flask import Flask,render_template,request,jsonify
 from mysqlutile import Mysql
-import json
 app = Flask(__name__)
 
 #十分钟实时数据
